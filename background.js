@@ -43,3 +43,8 @@ chrome.alarms.onAlarm.addListener((alarm) => {
     updateUnreadCount();
   }
 });
+
+// Ouvre Gmail lorsqu'on clique sur l'icône de l'extension
+chrome.action.onClicked.addListener(() => {
+  chrome.tabs.create({ url: 'https://mail.google.com/' });
+});

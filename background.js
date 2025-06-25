@@ -44,7 +44,8 @@ chrome.alarms.onAlarm.addListener((alarm) => {
   }
 });
 
-// Ouvre Gmail lorsqu'on clique sur l'icône de l'extension
+// Ouvre Gmail et rafraîchit le compteur lorsqu'on clique sur l'icône
 chrome.action.onClicked.addListener(() => {
+  updateUnreadCount();
   chrome.tabs.create({ url: 'https://mail.google.com/' });
 });

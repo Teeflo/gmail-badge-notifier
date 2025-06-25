@@ -10,6 +10,7 @@ Gmail Badge Notifier est une extension Chrome légère qui indique le nombre de 
 - Fonctionne en arrière-plan grâce à l'API `chrome.alarms` de Manifest V3.
 - Ouvre Gmail ou active l'onglet existant lorsqu'on clique sur l'icône de l'extension.
 - Rafraîchit immédiatement le nombre de mails non lus lorsqu'on clique sur l'icône.
+- Met à jour le badge automatiquement au démarrage de Chrome.
 
 ## Installation
 1. Téléchargez ou clonez ce dépôt.
@@ -20,6 +21,7 @@ Gmail Badge Notifier est une extension Chrome légère qui indique le nombre de 
 ## Comment ça marche
 L'extension utilise un service worker (`background.js`) pour interroger toutes les minutes le flux Atom de Gmail (`https://mail.google.com/mail/feed/atom`).
 Le nombre de messages non lus est extrait de la balise `<fullcount>` du flux. Ce nombre est affiché sur l'icône de l'extension. Si la requête échoue ou si aucun message n'est trouvé, le badge est caché.
+Pour que la lecture du flux réussisse, vous devez être connecté à Gmail dans Chrome.
 
 ## Confidentialité
 Cette extension n'accède qu'au nombre de messages non lus via le flux Atom. Elle ne lit ni ne stocke le contenu de vos e-mails.

@@ -19,10 +19,10 @@ async function updateUnreadCount() {
     const countElem = xml.querySelector('fullcount');
     if (!countElem) throw new Error('fullcount not found');
     const count = parseInt(countElem.textContent, 10);
+    await chrome.action.setBadgeBackgroundColor({ color: BADGE_COLOR });
     if (isNaN(count) || count === 0) {
       await chrome.action.setBadgeText({ text: '' });
     } else {
-      await chrome.action.setBadgeBackgroundColor({ color: BADGE_COLOR });
       await chrome.action.setBadgeText({ text: count.toString() });
     }
   } catch (e) {
@@ -35,6 +35,12 @@ async function updateUnreadCount() {
 chrome.runtime.onInstalled.addListener(() => {
   chrome.alarms.create('checkMail', { periodInMinutes: CHECK_INTERVAL_MINUTES });
   updateUnreadCount(); // Vérification immédiate
+});
+
+// Met à jour le badge et (re)programme l'alarme au démarrage du navigateur
+chrome.runtime.onStartup.addListener(() => {
+  chrome.alarms.create('checkMail', { periodInMinutes: CHECK_INTERVAL_MINUTES });
+  updateUnreadCount();
 });
 
 // Réagit à l'alarme périodique

@@ -44,8 +44,14 @@ chrome.alarms.onAlarm.addListener((alarm) => {
   }
 });
 
-// Ouvre Gmail et rafraîchit le compteur lorsqu'on clique sur l'icône
-chrome.action.onClicked.addListener(() => {
+// Ouvre Gmail ou active l'onglet existant lorsqu'on clique sur l'icône
+chrome.action.onClicked.addListener(async () => {
   updateUnreadCount();
-  chrome.tabs.create({ url: 'https://mail.google.com/' });
+  const tabs = await chrome.tabs.query({ url: 'https://mail.google.com/*' });
+  if (tabs.length > 0) {
+    await chrome.tabs.update(tabs[0].id, { active: true });
+    await chrome.windows.update(tabs[0].windowId, { focused: true });
+  } else {
+    await chrome.tabs.create({ url: 'https://mail.google.com/' });
+  }
 });

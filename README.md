@@ -8,7 +8,7 @@ Gmail Badge Notifier est une extension Chrome légère qui indique le nombre de 
 - Affiche ce nombre sur un badge rouge dans la barre d'outils Chrome.
 - Masque automatiquement le badge s'il n'y a pas de message non lu.
 - Fonctionne en arrière-plan grâce à l'API `chrome.alarms` de Manifest V3.
-- Ouvre Gmail dans un nouvel onglet lorsqu'on clique sur l'icône de l'extension.
+- Ouvre Gmail ou active l'onglet existant lorsqu'on clique sur l'icône de l'extension.
 - Rafraîchit immédiatement le nombre de mails non lus lorsqu'on clique sur l'icône.
 
 ## Installation

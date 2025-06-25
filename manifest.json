@@ -3,7 +3,7 @@
   "name": "Gmail Badge Notifier",
   "description": "Extension légère et respectueuse de la vie privée qui affiche le nombre de messages non lus sur Gmail.",
   "version": "1.0",
-  "permissions": ["alarms"],
+  "permissions": ["alarms", "tabs"],
   "host_permissions": ["https://mail.google.com/*"],
   "background": {
     "service_worker": "background.js"

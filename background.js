@@ -11,7 +11,7 @@ const CHECK_INTERVAL_MINUTES = 1;
  */
 async function updateUnreadCount() {
   try {
-    const response = await fetch('https://mail.google.com/mail/u/0/feed/atom', { credentials: 'include' });
+    const response = await fetch('https://mail.google.com/mail/feed/atom', { credentials: 'include' });
     if (!response.ok) throw new Error('Network response was not ok');
     const text = await response.text();
     const parser = new DOMParser();
@@ -28,23 +28,24 @@ async function updateUnreadCount() {
   } catch (e) {
     // En cas d'erreur (par ex. non connecté), on efface le badge
     await chrome.action.setBadgeText({ text: '' });
+    console.error('Failed to update unread count:', e);
   }
 }
 
 // Crée l'alarme lors de l'installation ou du démarrage de l'extension
-chrome.runtime.onInstalled.addListener(() => {
+chrome.runtime.onInstalled.addListener(async () => {
   chrome.alarms.create('checkMail', { periodInMinutes: CHECK_INTERVAL_MINUTES });
   updateUnreadCount(); // Vérification immédiate
 });
 
 // Met à jour le badge et (re)programme l'alarme au démarrage du navigateur
-chrome.runtime.onStartup.addListener(() => {
+chrome.runtime.onStartup.addListener(async () => {
   chrome.alarms.create('checkMail', { periodInMinutes: CHECK_INTERVAL_MINUTES });
   updateUnreadCount();
 });
 
 // Réagit à l'alarme périodique
-chrome.alarms.onAlarm.addListener((alarm) => {
+chrome.alarms.onAlarm.addListener(async (alarm) => {
   if (alarm.name === 'checkMail') {
     updateUnreadCount();
   }

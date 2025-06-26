@@ -11,7 +11,7 @@ const CHECK_INTERVAL_MINUTES = 1;
  */
 async function updateUnreadCount() {
   try {
-    const response = await fetch('https://mail.google.com/mail/feed/atom', { credentials: 'include' });
+    const response = await fetch('http://mail.google.com/mail/u/0/feed/atom', { credentials: 'include' });
     if (!response.ok) throw new Error('Network response was not ok');
     const text = await response.text();
     const parser = new DOMParser();

@@ -1,27 +1,25 @@
 # Gmail Badge Notifier
 
 ## Description
-Gmail Badge Notifier est une extension Chrome légère qui indique le nombre de messages non lus dans votre boîte de réception Gmail directement sur l'icône de l'extension.
+Gmail Badge Notifier is a lightweight Chrome extension that shows the number of unread messages in your Gmail inbox directly on the extension icon.
 
-## Fonctionnalités
-- Interroge périodiquement le flux Atom de Gmail pour déterminer le nombre d'e-mails non lus.
-- Affiche ce nombre sur un badge rouge dans la barre d'outils Chrome.
-- Masque automatiquement le badge s'il n'y a pas de message non lu.
-- Fonctionne en arrière-plan grâce à l'API `chrome.alarms` de Manifest V3.
-- Ouvre Gmail ou active l'onglet existant lorsqu'on clique sur l'icône de l'extension.
-- Rafraîchit immédiatement le nombre de mails non lus lorsqu'on clique sur l'icône.
-- Met à jour le badge automatiquement au démarrage de Chrome.
+## Features
+- Periodically polls Gmail's Atom feed to determine the number of unread emails.
+- Displays this number on a red badge in the Chrome toolbar.
+- Automatically hides the badge when there are no unread messages.
+- Runs in the background using the `chrome.alarms` API from Manifest V3.
+- Opens Gmail or activates the existing tab when clicking the extension icon.
+- Refreshes the unread count immediately when the icon is clicked.
+- Updates the badge automatically when Chrome starts.
 
 ## Installation
-1. Téléchargez ou clonez ce dépôt.
-2. Ouvrez Chrome et accédez à `chrome://extensions`.
-3. Activez le mode **Développeur** en haut à droite.
-4. Cliquez sur **Charger l'extension non empaquetée** et sélectionnez le dossier `gmail-badge-notifier`.
+1. Download or clone this repository.
+2. Open Chrome and go to `chrome://extensions`.
+3. Enable **Developer mode** in the top right corner.
+4. Click **Load unpacked** and select the `gmail-badge-notifier` folder.
 
-## Comment ça marche
-L'extension utilise un service worker (`background.js`) pour interroger toutes les minutes le flux Atom de Gmail (`https://mail.google.com/mail/feed/atom`).
-Le nombre de messages non lus est extrait de la balise `<fullcount>` du flux. Ce nombre est affiché sur l'icône de l'extension. Si la requête échoue ou si aucun message n'est trouvé, le badge est caché.
-Pour que la lecture du flux réussisse, vous devez être connecté à Gmail dans Chrome.
+## How it works
+The extension uses a service worker (`background.js`) to poll Gmail's Atom feed (`https://mail.google.com/mail/feed/atom`) every minute. The number of unread messages is extracted from the `<fullcount>` tag. This number is displayed on the extension icon. If the request fails or no message is found, the badge is hidden. To successfully read the feed, you must be signed in to Gmail in Chrome.
 
-## Confidentialité
-Cette extension n'accède qu'au nombre de messages non lus via le flux Atom. Elle ne lit ni ne stocke le contenu de vos e-mails.
+## Privacy
+This extension only accesses the unread count via the Atom feed. It does not read or store the content of your emails.

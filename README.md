@@ -19,7 +19,7 @@ Gmail Badge Notifier est une extension Chrome légère qui indique le nombre de 
 4. Cliquez sur **Charger l'extension non empaquetée** et sélectionnez le dossier `gmail-badge-notifier`.
 
 ## Comment ça marche
-L'extension utilise un service worker (`background.js`) pour interroger toutes les minutes le flux Atom de Gmail (`https://mail.google.com/mail/feed/atom`).
+L'extension utilise un service worker (`background.js`) pour interroger toutes les minutes le flux Atom de Gmail (`https://mail.google.com/mail/feed/atom`). Le flux est récupéré via **XMLHttpRequest** afin d'éviter les restrictions CORS que rencontre `fetch` sur ce domaine.
 Le nombre de messages non lus est extrait de la balise `<fullcount>` du flux. Ce nombre est affiché sur l'icône de l'extension. Si la requête échoue ou si aucun message n'est trouvé, le badge est caché.
 Pour que la lecture du flux réussisse, vous devez être connecté à Gmail dans Chrome.
 

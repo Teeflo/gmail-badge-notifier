@@ -25,3 +25,11 @@ Pour que la lecture du flux réussisse, vous devez être connecté à Gmail dans
 
 ## Confidentialité
 Cette extension n'accède qu'au nombre de messages non lus via le flux Atom. Elle ne lit ni ne stocke le contenu de vos e-mails.
+
+## Mode de test
+Pour vérifier simplement l'affichage du badge sans contacter Gmail, un service worker minimal `background-test.js` est fourni. Pour l'utiliser :
+1. Ouvrez le fichier `manifest.json`.
+2. Remplacez la valeur de `service_worker` par `background-test.js`.
+3. Rechargez l'extension depuis `chrome://extensions`.
+Le badge de l'extension affichera alors le texte **test**.
+

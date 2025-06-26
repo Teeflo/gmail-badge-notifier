@@ -9,29 +9,11 @@ const CHECK_INTERVAL_MINUTES = 1;
 /**
  * Met à jour le badge avec le nombre d'emails non lus.
  */
-/**
- * Récupère le flux Atom de Gmail via XHR pour éviter les problèmes CORS.
- */
-function fetchAtomFeed() {
-  return new Promise((resolve, reject) => {
-    const xhr = new XMLHttpRequest();
-    xhr.open('GET', 'https://mail.google.com/mail/feed/atom');
-    xhr.withCredentials = true;
-    xhr.onload = () => {
-      if (xhr.status >= 200 && xhr.status < 300) {
-        resolve(xhr.responseText);
-      } else {
-        reject(new Error(`HTTP status ${xhr.status}`));
-      }
-    };
-    xhr.onerror = () => reject(new Error('Network error'));
-    xhr.send();
-  });
-}
-
 async function updateUnreadCount() {
   try {
-    const text = await fetchAtomFeed();
+    const response = await fetch('https://mail.google.com/mail/feed/atom', { credentials: 'include' });
+    if (!response.ok) throw new Error('Network response was not ok');
+    const text = await response.text();
     const parser = new DOMParser();
     const xml = parser.parseFromString(text, 'application/xml');
     const countElem = xml.querySelector('fullcount');

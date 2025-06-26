@@ -14,11 +14,9 @@ async function updateUnreadCount() {
     const response = await fetch('https://mail.google.com/mail/feed/atom', { credentials: 'include' });
     if (!response.ok) throw new Error('Network response was not ok');
     const text = await response.text();
-    const parser = new DOMParser();
-    const xml = parser.parseFromString(text, 'application/xml');
-    const countElem = xml.querySelector('fullcount');
-    if (!countElem) throw new Error('fullcount not found');
-    const count = parseInt(countElem.textContent, 10);
+    const match = text.match(/<fullcount>(\d+)<\/fullcount>/i);
+    const count = match ? parseInt(match[1], 10) : NaN;
+    if (isNaN(count)) throw new Error('fullcount not found');
     await chrome.action.setBadgeBackgroundColor({ color: BADGE_COLOR });
     if (isNaN(count) || count === 0) {
       await chrome.action.setBadgeText({ text: '' });

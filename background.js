@@ -1,13 +1,13 @@
 // Gmail Badge Notifier - background service worker
-// Interroge périodiquement le flux Atom de Gmail et met à jour le badge
+// Periodically polls Gmail's Atom feed and updates the badge
 
-// Couleur du badge
+// Badge color
 const BADGE_COLOR = '#D93025';
-// Intervalle en minutes pour la vérification
+// Interval in minutes for checking
 const CHECK_INTERVAL_MINUTES = 1;
 
 /**
- * Met à jour le badge avec le nombre d'emails non lus.
+ * Updates the badge with the number of unread emails.
  */
 async function updateUnreadCount() {
   try {
@@ -24,32 +24,32 @@ async function updateUnreadCount() {
       await chrome.action.setBadgeText({ text: count.toString() });
     }
   } catch (e) {
-    // En cas d'erreur (par ex. non connecté), on efface le badge
+    // On error (e.g., not signed in), clear the badge
     await chrome.action.setBadgeText({ text: '' });
     console.error('Failed to update unread count:', e);
   }
 }
 
-// Crée l'alarme lors de l'installation ou du démarrage de l'extension
+// Create the alarm when the extension is installed or started
 chrome.runtime.onInstalled.addListener(async () => {
   chrome.alarms.create('checkMail', { periodInMinutes: CHECK_INTERVAL_MINUTES });
-  updateUnreadCount(); // Vérification immédiate
+  updateUnreadCount(); // Immediate check
 });
 
-// Met à jour le badge et (re)programme l'alarme au démarrage du navigateur
+// Update the badge and (re)schedule the alarm when the browser starts
 chrome.runtime.onStartup.addListener(async () => {
   chrome.alarms.create('checkMail', { periodInMinutes: CHECK_INTERVAL_MINUTES });
   updateUnreadCount();
 });
 
-// Réagit à l'alarme périodique
+// Responds to the periodic alarm
 chrome.alarms.onAlarm.addListener(async (alarm) => {
   if (alarm.name === 'checkMail') {
     updateUnreadCount();
   }
 });
 
-// Ouvre Gmail ou active l'onglet existant lorsqu'on clique sur l'icône
+// Opens Gmail or activates the existing tab when the icon is clicked
 chrome.action.onClicked.addListener(async () => {
   updateUnreadCount();
   const tabs = await chrome.tabs.query({ url: 'https://mail.google.com/*' });

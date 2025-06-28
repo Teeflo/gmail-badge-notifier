@@ -11,6 +11,27 @@ chrome.storage.local.get({ lastCount: 0 }, (data) => {
 // Interval in minutes for checking
 const CHECK_INTERVAL_MINUTES = 1;
 
+async function ensureOffscreen() {
+  if (!chrome.offscreen) return;
+  const exists = await chrome.offscreen.hasDocument?.();
+  if (!exists) {
+    await chrome.offscreen.createDocument({
+      url: chrome.runtime.getURL('offscreen.html'),
+      reasons: ['AUDIO_PLAYBACK'],
+      justification: 'Play notification sounds',
+    });
+  }
+}
+
+async function playSound(src) {
+  try {
+    await ensureOffscreen();
+    await chrome.runtime.sendMessage({ action: 'play', src });
+  } catch (e) {
+    console.error('Failed to play sound', e);
+  }
+}
+
 /**
  * Updates the badge with the number of unread emails.
  */
@@ -41,17 +62,10 @@ async function updateUnreadCount() {
         message: `You have ${count} unread emails.`,
       });
       if (sound !== 'none') {
-        try {
-          const src = sound.startsWith('data:')
-            ? sound
-            : chrome.runtime.getURL(sound);
-          const audio = new Audio(src);
-          audio.play().catch((e) => {
-            console.error('Failed to play sound', e);
-          });
-        } catch (e) {
-          console.error('Failed to play sound', e);
-        }
+        const src = sound.startsWith('data:')
+          ? sound
+          : chrome.runtime.getURL(sound);
+        playSound(src);
       }
     }
     lastCount = count;

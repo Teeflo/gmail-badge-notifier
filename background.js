@@ -42,8 +42,13 @@ async function updateUnreadCount() {
       });
       if (sound !== 'none') {
         try {
-          const audio = new Audio(sound);
-          audio.play();
+          const src = sound.startsWith('data:')
+            ? sound
+            : chrome.runtime.getURL(sound);
+          const audio = new Audio(src);
+          audio.play().catch((e) => {
+            console.error('Failed to play sound', e);
+          });
         } catch (e) {
           console.error('Failed to play sound', e);
         }

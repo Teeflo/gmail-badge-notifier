@@ -1,0 +1,31 @@
+body {
+  font-family: Arial, sans-serif;
+  padding: 20px;
+  background: #f6f6f6;
+}
+
+.container {
+  max-width: 480px;
+  margin: 0 auto;
+  background: #fff;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+section {
+  margin-bottom: 15px;
+  display: flex;
+  flex-direction: column;
+}
+
+.status {
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  color: #4caf50;
+}
+
+@media (prefers-color-scheme: dark) {
+  body { background: #222; color: #eee; }
+  .container { background: #333; box-shadow: none; }
+}

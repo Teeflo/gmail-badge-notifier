@@ -1,8 +1,13 @@
 // Gmail Badge Notifier - background service worker
 // Periodically polls Gmail's Atom feed and updates the badge
 
-// Badge color
-const BADGE_COLOR = '#D93025';
+// Default badge color
+const DEFAULT_BADGE_COLOR = '#D93025';
+let lastCount = 0;
+
+chrome.storage.local.get({ lastCount: 0 }, (data) => {
+  lastCount = data.lastCount;
+});
 // Interval in minutes for checking
 const CHECK_INTERVAL_MINUTES = 1;
 
@@ -17,12 +22,32 @@ async function updateUnreadCount() {
     const match = text.match(/<fullcount>(\d+)<\/fullcount>/i);
     const count = match ? parseInt(match[1], 10) : NaN;
     if (isNaN(count)) throw new Error('fullcount not found');
-    await chrome.action.setBadgeBackgroundColor({ color: BADGE_COLOR });
+    const { badgeColor = DEFAULT_BADGE_COLOR, sound = 'none' } = await chrome.storage.sync.get(['badgeColor', 'sound']);
+    await chrome.action.setBadgeBackgroundColor({ color: badgeColor });
     if (isNaN(count) || count === 0) {
       await chrome.action.setBadgeText({ text: '' });
     } else {
       await chrome.action.setBadgeText({ text: count.toString() });
     }
+
+    if (count > lastCount) {
+      chrome.notifications.create({
+        type: 'basic',
+        iconUrl: 'icons/icon128.png',
+        title: 'New Email',
+        message: `You have ${count} unread emails.`,
+      });
+      if (sound !== 'none') {
+        try {
+          const audio = new Audio(sound);
+          audio.play();
+        } catch (e) {
+          console.error('Failed to play sound', e);
+        }
+      }
+    }
+    lastCount = count;
+    chrome.storage.local.set({ lastCount: count });
   } catch (e) {
     // On error (e.g., not signed in), clear the badge
     await chrome.action.setBadgeText({ text: '' });

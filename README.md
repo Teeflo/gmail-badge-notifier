@@ -6,6 +6,8 @@ Gmail Badge Notifier is a lightweight Chrome extension that shows the number of 
 ## Features
 - Periodically polls Gmail's Atom feed to determine the number of unread emails.
 - Displays this number on a red badge in the Chrome toolbar.
+- Sends a desktop notification when new mail arrives.
+- Badge and notification colors are configurable from the options page.
 - Automatically hides the badge when there are no unread messages.
 - Runs in the background using the `chrome.alarms` API from Manifest V3.
 - Opens Gmail or activates the existing tab when clicking the extension icon.
@@ -23,3 +25,6 @@ The extension uses a service worker (`background.js`) to poll Gmail's Atom feed 
 
 ## Privacy
 This extension only accesses the unread count via the Atom feed. It does not read or store the content of your emails.
+
+## Options
+Open the extension options to choose the badge color and notification sound.

@@ -1,4 +1,4 @@
-function saveOptions() {
+async function saveOptions() {
   const color = document.getElementById('badgeColor').value;
   const select = document.getElementById('soundSelect');
   const sound = select.value;
@@ -6,26 +6,39 @@ function saveOptions() {
     const file = document.getElementById('customSound').files[0];
     if (file && file.size <= 500 * 1024) {
       const reader = new FileReader();
-      reader.onload = () => {
-        chrome.storage.sync.set({ badgeColor: color, sound: reader.result });
+      reader.onload = async () => {
+        await chrome.storage.sync.set({ badgeColor: color, sound: reader.result });
+        showStatus();
       };
       reader.readAsDataURL(file);
+      return;
     }
+  }
+  await chrome.storage.sync.set({ badgeColor: color, sound });
+  showStatus();
+}
+
+async function restoreOptions() {
+  const { badgeColor, sound } = await chrome.storage.sync.get({
+    badgeColor: '#D93025',
+    sound: 'none',
+  });
+  document.getElementById('badgeColor').value = badgeColor;
+  const select = document.getElementById('soundSelect');
+  if (sound.startsWith('data:')) {
+    select.value = 'custom';
   } else {
-    chrome.storage.sync.set({ badgeColor: color, sound: sound });
+    select.value = sound;
   }
 }
 
-function restoreOptions() {
-  chrome.storage.sync.get({ badgeColor: '#D93025', sound: 'none' }, (items) => {
-    document.getElementById('badgeColor').value = items.badgeColor;
-    const select = document.getElementById('soundSelect');
-    if (items.sound.startsWith('data:')) {
-      select.value = 'custom';
-    } else {
-      select.value = items.sound;
-    }
-  });
+function showStatus() {
+  const status = document.getElementById('status');
+  status.textContent = 'Options saved';
+  status.style.opacity = '1';
+  setTimeout(() => {
+    status.style.opacity = '0';
+  }, 1000);
 }
 
 document.addEventListener('DOMContentLoaded', restoreOptions);

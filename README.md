@@ -28,3 +28,5 @@ This extension only accesses the unread count via the Atom feed. It does not rea
 
 ## Options
 Open the extension options to choose the badge color and notification sound.
+Your preferences are stored using `chrome.storage.sync` so they will be
+restored the next time you open Chrome.

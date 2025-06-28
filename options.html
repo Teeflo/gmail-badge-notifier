@@ -6,22 +6,25 @@
   <link rel="stylesheet" href="options.css">
 </head>
 <body>
-  <h1>Extension Options</h1>
-  <section>
-    <label for="badgeColor">Badge color:</label>
-    <input type="color" id="badgeColor">
-  </section>
-  <section>
-    <label for="soundSelect">Notification sound:</label>
-    <select id="soundSelect">
-      <option value="none">None</option>
-      <option value="sounds/ding.mp3">Ding</option>
-      <option value="sounds/chime.mp3">Chime</option>
-      <option value="sounds/notify.mp3">Notify</option>
-      <option value="custom">Custom...</option>
-    </select>
-    <input type="file" id="customSound" accept="audio/*" style="display:none">
-  </section>
+  <div class="container">
+    <h1>Extension Options</h1>
+    <section>
+      <label for="badgeColor">Badge color:</label>
+      <input type="color" id="badgeColor">
+    </section>
+    <section>
+      <label for="soundSelect">Notification sound:</label>
+      <select id="soundSelect">
+        <option value="none">None</option>
+        <option value="sounds/ding.mp3">Ding</option>
+        <option value="sounds/chime.mp3">Chime</option>
+        <option value="sounds/notify.mp3">Notify</option>
+        <option value="custom">Custom...</option>
+      </select>
+      <input type="file" id="customSound" accept="audio/*" style="display:none">
+    </section>
+    <div id="status" class="status"></div>
+  </div>
   <script src="options.js"></script>
 </body>
 </html>

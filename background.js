@@ -22,7 +22,10 @@ async function updateUnreadCount() {
     const match = text.match(/<fullcount>(\d+)<\/fullcount>/i);
     const count = match ? parseInt(match[1], 10) : NaN;
     if (isNaN(count)) throw new Error('fullcount not found');
-    const { badgeColor = DEFAULT_BADGE_COLOR, sound = 'none' } = await chrome.storage.sync.get(['badgeColor', 'sound']);
+    const { badgeColor, sound } = await chrome.storage.sync.get({
+      badgeColor: DEFAULT_BADGE_COLOR,
+      sound: 'none'
+    });
     await chrome.action.setBadgeBackgroundColor({ color: badgeColor });
     if (isNaN(count) || count === 0) {
       await chrome.action.setBadgeText({ text: '' });

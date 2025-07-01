@@ -1,0 +1,18 @@
+{
+  "optionsTitle": {"message": "Extension Options"},
+  "badgeColorLabel": {"message": "Badge color:"},
+  "soundLabel": {"message": "Notification sound:"},
+  "soundEnabledLabel": {"message": "Enable sound"},
+  "volumeLabel": {"message": "Volume"},
+  "presetLabel": {"message": "Preset"},
+  "importBtn": {"message": "Import"},
+  "exportBtn": {"message": "Export"},
+  "darkModeLabel": {"message": "Dark mode"},
+  "generalTab": {"message": "General"},
+  "advancedTab": {"message": "Advanced"},
+  "statusSaved": {"message": "Options saved"},
+  "shortcutLabel": {"message": "Refresh shortcut"},
+  "recordShortcut": {"message": "Record"},
+  "statsHeader": {"message": "Statistics"},
+  "cloudSyncBtn": {"message": "Cloud backup"}
+}

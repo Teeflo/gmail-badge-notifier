@@ -3,7 +3,8 @@
   "name": "Gmail Badge Notifier",
   "description": "Lightweight and privacy-friendly extension that displays the number of unread messages on Gmail.",
   "version": "1.0",
-  "permissions": ["alarms", "tabs", "notifications", "storage", "offscreen"],
+  "default_locale": "en",
+  "permissions": ["alarms", "tabs", "notifications", "storage", "offscreen", "commands"],
   "host_permissions": ["https://mail.google.com/*"],
   "background": {
     "service_worker": "background.js"
@@ -27,5 +28,13 @@
   "web_accessible_resources": [{
     "resources": ["sounds/*"],
     "matches": ["<all_urls>"]
-  }]
+  }],
+  "commands": {
+    "refresh-count": {
+      "suggested_key": {
+        "default": "Ctrl+Shift+F"
+      },
+      "description": "Refresh unread count"
+    }
+  }
 }

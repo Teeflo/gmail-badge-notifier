@@ -2,29 +2,83 @@
 <html>
 <head>
   <meta charset="utf-8">
-  <title>Gmail Badge Notifier Options</title>
+  <title data-i18n="optionsTitle">Options</title>
+  <link rel="stylesheet" href="https://unpkg.com/material-components-web@latest/dist/material-components-web.min.css">
   <link rel="stylesheet" href="options.css">
 </head>
 <body>
-  <div class="container">
-    <h1>Extension Options</h1>
-    <section>
-      <label for="badgeColor">Badge color:</label>
-      <input type="color" id="badgeColor">
-    </section>
-    <section>
-      <label for="soundSelect">Notification sound:</label>
-      <select id="soundSelect">
-        <option value="none">None</option>
-        <option value="sounds/ding.mp3">Ding</option>
-        <option value="sounds/chime.mp3">Chime</option>
-        <option value="sounds/notify.mp3">Notify</option>
-        <option value="custom">Custom...</option>
-      </select>
-      <input type="file" id="customSound" accept="audio/*" style="display:none">
-    </section>
-    <div id="status" class="status"></div>
+  <div class="container mdc-typography">
+    <h1 class="mdc-typography--headline5" data-i18n="optionsTitle">Extension Options</h1>
+    <div class="theme-toggle">
+      <label class="mdc-switch">
+        <input type="checkbox" class="mdc-switch__native-control" id="darkModeSwitch">
+        <div class="mdc-switch__background">
+          <div class="mdc-switch__knob"></div>
+        </div>
+      </label>
+      <span data-i18n="darkModeLabel">Dark mode</span>
+    </div>
+    <nav class="tabs" role="tablist">
+      <button class="tab active" data-tab="general" data-i18n="generalTab">General</button>
+      <button class="tab" data-tab="advanced" data-i18n="advancedTab">Advanced</button>
+    </nav>
+    <div id="general" class="tab-content">
+      <section>
+        <label for="badgeColor" data-i18n="badgeColorLabel">Badge color:</label>
+        <input type="color" id="badgeColor" aria-describedby="colorPreview">
+        <span id="colorPreview" class="badge-preview" aria-hidden="true"></span>
+      </section>
+      <section>
+        <label for="soundEnabled" data-i18n="soundEnabledLabel">Enable sound</label>
+        <label class="mdc-switch">
+          <input type="checkbox" class="mdc-switch__native-control" id="soundEnabled">
+          <div class="mdc-switch__background">
+            <div class="mdc-switch__knob"></div>
+          </div>
+        </label>
+      </section>
+      <section>
+        <label for="volume" data-i18n="volumeLabel">Volume</label>
+        <input type="range" id="volume" min="0" max="1" step="0.1">
+      </section>
+      <section>
+        <label for="soundSelect" data-i18n="soundLabel">Notification sound:</label>
+        <select id="soundSelect">
+          <option value="none" data-i18n="soundNone">None</option>
+          <option value="sounds/ding.mp3">Ding</option>
+          <option value="sounds/chime.mp3">Chime</option>
+          <option value="sounds/notify.mp3">Notify</option>
+          <option value="custom" data-i18n="soundCustom">Custom...</option>
+        </select>
+        <input type="file" id="customSound" accept="audio/*" style="display:none">
+      </section>
+      <section>
+        <label for="presetSelect" data-i18n="presetLabel">Preset</label>
+        <select id="presetSelect"></select>
+      </section>
+    </div>
+    <div id="advanced" class="tab-content" hidden>
+      <section>
+        <button id="exportBtn" class="mdc-button" data-i18n="exportBtn">Export</button>
+        <button id="importBtn" class="mdc-button" data-i18n="importBtn">Import</button>
+        <input type="file" id="importFile" accept="application/json" style="display:none">
+      </section>
+      <section>
+        <label for="shortcutInput" data-i18n="shortcutLabel">Refresh shortcut</label>
+        <input id="shortcutInput" type="text" readonly>
+        <button id="recordShortcut" class="mdc-button" data-i18n="recordShortcut">Record</button>
+      </section>
+      <section>
+        <h2 data-i18n="statsHeader">Statistics</h2>
+        <div id="statsArea"></div>
+      </section>
+      <section>
+        <button id="cloudSync" class="mdc-button" data-i18n="cloudSyncBtn">Cloud backup</button>
+      </section>
+    </div>
+    <div id="status" class="status" aria-live="polite"></div>
   </div>
+  <script src="https://unpkg.com/material-components-web@latest/dist/material-components-web.min.js"></script>
   <script src="options.js"></script>
 </body>
 </html>

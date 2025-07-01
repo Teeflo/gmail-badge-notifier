@@ -2,30 +2,63 @@ body {
   font-family: Arial, sans-serif;
   padding: 20px;
   background: #f6f6f6;
+  color: #333;
 }
 
 .container {
-  max-width: 480px;
+  max-width: 500px;
   margin: 0 auto;
-  background: #fff;
-  padding: 20px;
-  border-radius: 8px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
-section {
-  margin-bottom: 15px;
+.theme-toggle {
   display: flex;
-  flex-direction: column;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.tabs {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 15px;
+}
+
+.tab {
+  background: none;
+  border: none;
+  padding: 8px 16px;
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+}
+
+.tab.active {
+  border-color: #6200ee;
+}
+
+.tab-content {
+  margin-top: 10px;
+}
+
+.badge-preview {
+  display: inline-block;
+  width: 20px;
+  height: 20px;
+  margin-left: 8px;
+  border-radius: 4px;
+  vertical-align: middle;
 }
 
 .status {
   opacity: 0;
   transition: opacity 0.3s ease;
   color: #4caf50;
+  margin-top: 10px;
 }
 
-@media (prefers-color-scheme: dark) {
-  body { background: #222; color: #eee; }
-  .container { background: #333; box-shadow: none; }
+body.dark {
+  background: #222;
+  color: #eee;
+}
+
+body.dark .tab.active {
+  border-color: #bb86fc;
 }

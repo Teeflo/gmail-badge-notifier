@@ -4,9 +4,13 @@
 // Default badge color
 const DEFAULT_BADGE_COLOR = '#D93025';
 let lastCount = 0;
+let stats = { notifications: 0, lastCheck: null };
 
 chrome.storage.local.get({ lastCount: 0 }, (data) => {
   lastCount = data.lastCount;
+});
+chrome.storage.local.get({ stats }, (data) => {
+  stats = data.stats;
 });
 // Interval in minutes for checking
 const CHECK_INTERVAL_MINUTES = 1;
@@ -23,10 +27,10 @@ async function ensureOffscreen() {
   }
 }
 
-async function playSound(src) {
+async function playSound(src, volume) {
   try {
     await ensureOffscreen();
-    await chrome.runtime.sendMessage({ action: 'play', src });
+    await chrome.runtime.sendMessage({ action: 'play', src, volume });
   } catch (e) {
     console.error('Failed to play sound', e);
   }
@@ -43,9 +47,11 @@ async function updateUnreadCount() {
     const match = text.match(/<fullcount>(\d+)<\/fullcount>/i);
     const count = match ? parseInt(match[1], 10) : NaN;
     if (isNaN(count)) throw new Error('fullcount not found');
-    const { badgeColor, sound } = await chrome.storage.sync.get({
+    const { badgeColor, sound, soundEnabled, volume } = await chrome.storage.sync.get({
       badgeColor: DEFAULT_BADGE_COLOR,
-      sound: 'none'
+      sound: 'none',
+      soundEnabled: true,
+      volume: 1
     });
     await chrome.action.setBadgeBackgroundColor({ color: badgeColor });
     if (isNaN(count) || count === 0) {
@@ -61,18 +67,22 @@ async function updateUnreadCount() {
         title: 'New Email',
         message: `You have ${count} unread emails.`,
       });
-      if (sound !== 'none') {
+      stats.notifications += 1;
+      if (soundEnabled && sound !== 'none') {
         const src = sound.startsWith('data:')
           ? sound
           : chrome.runtime.getURL(sound);
-        playSound(src);
+        playSound(src, volume);
       }
     }
     lastCount = count;
-    chrome.storage.local.set({ lastCount: count });
+    stats.lastCheck = Date.now();
+    chrome.storage.local.set({ lastCount: count, stats });
   } catch (e) {
     // On error (e.g., not signed in), clear the badge
     await chrome.action.setBadgeText({ text: '' });
+    stats.lastCheck = Date.now();
+    chrome.storage.local.set({ stats });
     console.error('Failed to update unread count:', e);
   }
 }
@@ -105,5 +115,11 @@ chrome.action.onClicked.addListener(async () => {
     await chrome.windows.update(tabs[0].windowId, { focused: true });
   } else {
     await chrome.tabs.create({ url: 'https://mail.google.com/' });
+  }
+});
+
+chrome.commands.onCommand.addListener((command) => {
+  if (command === 'refresh-count') {
+    updateUnreadCount();
   }
 });

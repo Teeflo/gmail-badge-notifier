@@ -6,6 +6,36 @@ const DEFAULT_BADGE_COLOR = '#D93025';
 let lastCounts = {};
 let accountUrls = [];
 
+/**
+ * Structured logger helper.
+ * @param {"info"|"error"} level
+ * @param {string} msg
+ * @param {object} [data]
+ */
+function log(level, msg, data = {}) {
+  const entry = { time: new Date().toISOString(), level, msg, ...data };
+  const fn = level === 'error' ? console.error : console.log;
+  fn(entry);
+}
+
+const CACHE_TTL = 30000; // 30 seconds
+const FETCH_TIMEOUT = 10000;
+const cache = new Map();
+
+function delay(ms) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+async function fetchWithTimeout(url, opts = {}, timeoutMs = FETCH_TIMEOUT) {
+  const controller = new AbortController();
+  const id = setTimeout(() => controller.abort(), timeoutMs);
+  try {
+    return await fetch(url, { ...opts, signal: controller.signal, credentials: 'include' });
+  } finally {
+    clearTimeout(id);
+  }
+}
+
 function getDynamicColor(count, base) {
   if (count >= 16) return '#D93025';
   if (count >= 6) return '#FABB05';
@@ -30,51 +60,74 @@ chrome.storage.local.get({ lastCounts: {} }, (data) => {
   lastCounts = data.lastCounts || {};
 });
 
-async function detectAccounts() {
+/**
+ * Detects logged-in Gmail accounts by probing their Atom feeds.
+ * @param {number} max Accounts to probe
+ * @returns {Promise<string[]>}
+ */
+async function detectAccounts(max = 5) {
   const urls = [];
-  for (let i = 0; i < 5; i++) {
+  for (let i = 0; i < max; i++) {
     const url = i === 0
       ? 'https://mail.google.com/mail/feed/atom'
       : `https://mail.google.com/mail/u/${i}/feed/atom`;
     try {
-      const resp = await fetch(url, { credentials: 'include' });
+      const resp = await fetchWithTimeout(url);
       if (resp.ok) {
         urls.push(url);
-      } else if (resp.status === 401 || resp.status === 404) {
+      } else if ([401, 404].includes(resp.status)) {
         break;
+      } else {
+        log('error', 'Account detection failed', { status: resp.status });
       }
     } catch (e) {
+      log('error', 'Account detection error', { error: String(e) });
       break;
     }
   }
   return urls;
 }
 
+/**
+ * Fetch unread count for a Gmail Atom feed URL.
+ * Results are cached for a short period to avoid excessive requests.
+ * @param {string} url Feed URL
+ * @returns {Promise<{count:number,email:string}>}
+ */
 async function fetchUnread(url) {
-  const resp = await fetch(url, { credentials: 'include' });
-  if (!resp.ok) throw new Error('bad response');
+  const cached = cache.get(url);
+  const now = Date.now();
+  if (cached && now - cached.time < CACHE_TTL) {
+    return cached.data;
+  }
+  const resp = await fetchWithTimeout(url);
+  if (!resp.ok) throw new Error(`bad response ${resp.status}`);
   const text = await resp.text();
-  const cMatch = text.match(/<fullcount>(\d+)<\/fullcount>/i);
-  const count = cMatch ? parseInt(cMatch[1], 10) : 0;
-  const eMatch = text.match(/Inbox for ([^<]+)</i);
-  const email = eMatch ? eMatch[1] : url;
-  return { count, email };
+  const parser = new DOMParser();
+  const xml = parser.parseFromString(text, 'application/xml');
+  const count = parseInt(xml.querySelector('fullcount')?.textContent || '0', 10);
+  const title = xml.querySelector('title')?.textContent || url;
+  const email = title.replace('Inbox for ', '');
+  const data = { count, email };
+  cache.set(url, { time: now, data });
+  return data;
 }
 
 async function scheduleAlarm() {
-  const { interval } = await chrome.storage.sync.get({ interval: 1 });
-  const now = new Date();
-  let period = interval;
-  if (now.getHours() < 9 || now.getHours() >= 18) {
-    period = Math.max(interval, 5);
-  }
+  const { interval, nightStart, nightEnd } = await chrome.storage.sync.get({
+    interval: 1,
+    nightStart: '22:00',
+    nightEnd: '07:00',
+  });
+  const isNight = isDndActive(nightStart, nightEnd);
+  const period = isNight ? Math.max(interval, 5) : interval;
   chrome.alarms.create('checkMail', { periodInMinutes: period });
 }
 
 async function ensureOffscreen() {
   if (!chrome.offscreen) return;
-  const exists = await chrome.offscreen.hasDocument?.();
-  if (!exists) {
+  const hasDoc = chrome.offscreen.hasDocument ? await chrome.offscreen.hasDocument() : false;
+  if (!hasDoc) {
     await chrome.offscreen.createDocument({
       url: chrome.runtime.getURL('offscreen.html'),
       reasons: ['AUDIO_PLAYBACK'],
@@ -88,7 +141,13 @@ async function playSound(src) {
     await ensureOffscreen();
     await chrome.runtime.sendMessage({ action: 'play', src });
   } catch (e) {
-    console.error('Failed to play sound', e);
+    log('error', 'playSound failed, retrying', { error: String(e) });
+    try {
+      await delay(500);
+      await chrome.runtime.sendMessage({ action: 'play', src });
+    } catch (err) {
+      log('error', 'playSound final failure', { error: String(err) });
+    }
   }
 }
 
@@ -113,7 +172,10 @@ async function updateAllCounts() {
     if (accountUrls.length === 0) {
       accountUrls = await detectAccounts();
     }
-    const results = await Promise.all(accountUrls.map((u) => fetchUnread(u).catch(() => null)));
+    const results = await Promise.all(accountUrls.map((u) => fetchUnread(u).catch((err) => {
+      log('error', 'fetchUnread failed', { url: u, error: String(err) });
+      return null;
+    })));
     const counts = {};
     let total = 0;
     for (const r of results) {
@@ -137,6 +199,8 @@ async function updateAllCounts() {
       animation: 'none',
       dndStart: '',
       dndEnd: '',
+      nightStart: '22:00',
+      nightEnd: '07:00',
     });
 
     const color = dynamicColors ? getDynamicColor(total, badgeColor) : badgeColor;
@@ -163,7 +227,7 @@ async function updateAllCounts() {
     chrome.storage.local.set({ lastCounts: counts });
   } catch (e) {
     await chrome.action.setBadgeText({ text: '' });
-    console.error('Failed to update unread count:', e);
+    log('error', 'Failed to update unread count', { error: String(e) });
   }
 }
 

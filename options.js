@@ -6,6 +6,8 @@ async function saveOptions() {
   const interval = parseFloat(document.getElementById('interval').value);
   const dndStart = document.getElementById('dndStart').value;
   const dndEnd = document.getElementById('dndEnd').value;
+  const nightStart = document.getElementById('nightStart').value;
+  const nightEnd = document.getElementById('nightEnd').value;
   const select = document.getElementById('soundSelect');
   const sound = select.value;
   if (sound === 'custom') {
@@ -29,6 +31,8 @@ async function saveOptions() {
     interval,
     dndStart,
     dndEnd,
+    nightStart,
+    nightEnd,
     sound,
   });
   showStatus();
@@ -44,6 +48,8 @@ async function restoreOptions() {
     interval,
     dndStart,
     dndEnd,
+    nightStart,
+    nightEnd,
     sound,
   } = await chrome.storage.sync.get({
     badgeColor: '#D93025',
@@ -53,6 +59,8 @@ async function restoreOptions() {
     interval: 1,
     dndStart: '',
     dndEnd: '',
+    nightStart: '22:00',
+    nightEnd: '07:00',
     sound: 'none',
   });
   document.getElementById('badgeColor').value = badgeColor;
@@ -63,6 +71,8 @@ async function restoreOptions() {
   document.getElementById('intervalVal').textContent = interval;
   document.getElementById('dndStart').value = dndStart;
   document.getElementById('dndEnd').value = dndEnd;
+  document.getElementById('nightStart').value = nightStart;
+  document.getElementById('nightEnd').value = nightEnd;
   const select = document.getElementById('soundSelect');
   if (sound.startsWith('data:')) {
     select.value = 'custom';
@@ -97,3 +107,5 @@ document.getElementById('interval').addEventListener('input', () => {
 });
 document.getElementById('dndStart').addEventListener('change', saveOptions);
 document.getElementById('dndEnd').addEventListener('change', saveOptions);
+document.getElementById('nightStart').addEventListener('change', saveOptions);
+document.getElementById('nightEnd').addEventListener('change', saveOptions);

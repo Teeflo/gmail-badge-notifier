@@ -16,7 +16,8 @@
       "48": "icons/icon48.png",
       "128": "icons/icon128.png"
     },
-    "default_title": "Gmail Badge Notifier"
+    "default_title": "Gmail Badge Notifier",
+    "default_popup": "popup.html"
   },
   "icons": {
     "16": "icons/icon16.png",

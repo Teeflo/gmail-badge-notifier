@@ -41,7 +41,8 @@ input[type="range"] {
   font-size: 14px;
 }
 
-.dnd {
+.dnd,
+.night {
   display: flex;
   gap: 12px;
   align-items: center;

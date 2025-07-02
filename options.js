@@ -13,7 +13,16 @@ async function saveOptions() {
     if (file && file.size <= 500 * 1024) {
       const reader = new FileReader();
       reader.onload = async () => {
-        await chrome.storage.sync.set({ badgeColor: color, sound: reader.result });
+        await chrome.storage.sync.set({
+          badgeColor: color,
+          textColor,
+          dynamicColors,
+          animation,
+          interval,
+          dndStart,
+          dndEnd,
+          sound: reader.result,
+        });
         showStatus();
         chrome.runtime.sendMessage({ action: 'optionsChanged' });
       };

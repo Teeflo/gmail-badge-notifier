@@ -234,7 +234,8 @@ async function updateAllCounts() {
     });
 
     const color = dynamicColors ? getDynamicColor(total, badgeColor) : badgeColor;
-    await chrome.action.setBadgeText({ text: '' });
+    await chrome.action.setBadgeBackgroundColor({ color });
+    await chrome.action.setBadgeText({ text: total > 0 ? String(total) : '' });
     await drawBadgeIcon(total, color, badgeShape, badgeScale, badgePosition, textColor);
 
     const lastTotal = Object.values(lastCounts).reduce((a, b) => a + b, 0);

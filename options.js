@@ -1,5 +1,12 @@
 async function saveOptions() {
   const color = document.getElementById('badgeColor').value;
+  const dynamicColors = document.getElementById('dynamicColors').checked;
+  const shape = document.getElementById('badgeShape').value;
+  const animation = document.getElementById('animation').value;
+  const theme = document.getElementById('theme').value;
+  const interval = parseFloat(document.getElementById('interval').value);
+  const dndStart = document.getElementById('dndStart').value;
+  const dndEnd = document.getElementById('dndEnd').value;
   const select = document.getElementById('soundSelect');
   const sound = select.value;
   if (sound === 'custom') {
@@ -14,16 +21,51 @@ async function saveOptions() {
       return;
     }
   }
-  await chrome.storage.sync.set({ badgeColor: color, sound });
+  await chrome.storage.sync.set({
+    badgeColor: color,
+    dynamicColors,
+    badgeShape: shape,
+    animation,
+    theme,
+    interval,
+    dndStart,
+    dndEnd,
+    sound,
+  });
   showStatus();
 }
 
 async function restoreOptions() {
-  const { badgeColor, sound } = await chrome.storage.sync.get({
+  const {
+    badgeColor,
+    dynamicColors,
+    badgeShape,
+    animation,
+    theme,
+    interval,
+    dndStart,
+    dndEnd,
+    sound,
+  } = await chrome.storage.sync.get({
     badgeColor: '#D93025',
+    dynamicColors: false,
+    badgeShape: 'round',
+    animation: 'none',
+    theme: 'auto',
+    interval: 1,
+    dndStart: '',
+    dndEnd: '',
     sound: 'none',
   });
   document.getElementById('badgeColor').value = badgeColor;
+  document.getElementById('dynamicColors').checked = dynamicColors;
+  document.getElementById('badgeShape').value = badgeShape;
+  document.getElementById('animation').value = animation;
+  document.getElementById('theme').value = theme;
+  document.getElementById('interval').value = interval;
+  document.getElementById('intervalVal').textContent = interval;
+  document.getElementById('dndStart').value = dndStart;
+  document.getElementById('dndEnd').value = dndEnd;
   const select = document.getElementById('soundSelect');
   if (sound.startsWith('data:')) {
     select.value = 'custom';
@@ -49,3 +91,13 @@ document.getElementById('soundSelect').addEventListener('change', () => {
   saveOptions();
 });
 document.getElementById('customSound').addEventListener('change', saveOptions);
+document.getElementById('dynamicColors').addEventListener('change', saveOptions);
+document.getElementById('badgeShape').addEventListener('change', saveOptions);
+document.getElementById('animation').addEventListener('change', saveOptions);
+document.getElementById('theme').addEventListener('change', saveOptions);
+document.getElementById('interval').addEventListener('input', () => {
+  document.getElementById('intervalVal').textContent = document.getElementById('interval').value;
+  saveOptions();
+});
+document.getElementById('dndStart').addEventListener('change', saveOptions);
+document.getElementById('dndEnd').addEventListener('change', saveOptions);

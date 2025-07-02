@@ -12,6 +12,34 @@
       <label for="badgeColor">Badge color:</label>
       <input type="color" id="badgeColor">
     </section>
+      <section>
+        <label for="dynamicColors">
+          <input type="checkbox" id="dynamicColors">
+          Use dynamic badge colors
+        </label>
+      </section>
+      <section>
+        <label for="textColor">Badge text color:</label>
+        <input type="color" id="textColor">
+      </section>
+    <section>
+      <label for="animation">Badge animation:</label>
+      <select id="animation">
+        <option value="none">None</option>
+        <option value="pulse">Pulse</option>
+      </select>
+    </section>
+    <section>
+      <label for="interval">Check interval (minutes): <span id="intervalVal"></span></label>
+      <input type="range" id="interval" min="0.5" max="30" step="0.5">
+    </section>
+    <section>
+      <label>Do Not Disturb:</label>
+      <div class="dnd">
+        <input type="time" id="dndStart"> -
+        <input type="time" id="dndEnd">
+      </div>
+    </section>
     <section>
       <label for="soundSelect">Notification sound:</label>
       <select id="soundSelect">
@@ -28,3 +56,4 @@
   <script src="options.js"></script>
 </body>
 </html>
+

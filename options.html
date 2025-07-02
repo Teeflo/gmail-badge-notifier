@@ -12,16 +12,33 @@
       <label for="badgeColor">Badge color:</label>
       <input type="color" id="badgeColor">
     </section>
-    <section>
-      <label for="dynamicColors">
-        <input type="checkbox" id="dynamicColors">
-        Use dynamic badge colors
-      </label>
-    </section>
-    <section>
-      <label for="badgeShape">Badge shape:</label>
-      <select id="badgeShape">
-        <option value="round">Round</option>
+      <section>
+        <label for="dynamicColors">
+          <input type="checkbox" id="dynamicColors">
+          Use dynamic badge colors
+        </label>
+      </section>
+      <section>
+        <label for="textColor">Badge text color:</label>
+        <input type="color" id="textColor">
+      </section>
+      <section>
+        <label for="badgeScale">Badge size (%): <span id="badgeScaleVal"></span></label>
+        <input type="range" id="badgeScale" min="30" max="100" step="5">
+      </section>
+      <section>
+        <label for="badgePosition">Badge position:</label>
+        <select id="badgePosition">
+          <option value="top-left">Top left</option>
+          <option value="top-right">Top right</option>
+          <option value="bottom-left">Bottom left</option>
+          <option value="bottom-right">Bottom right</option>
+        </select>
+      </section>
+      <section>
+        <label for="badgeShape">Badge shape:</label>
+        <select id="badgeShape">
+          <option value="round">Round</option>
         <option value="square">Square</option>
         <option value="hex">Hexagon</option>
       </select>

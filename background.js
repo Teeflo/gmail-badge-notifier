@@ -35,7 +35,7 @@ function isDndActive(start, end) {
   return cur >= s || cur < e;
 }
 
-async function drawBadgeIcon(count, color, shape) {
+async function drawBadgeIcon(count, color, shape, scale = 0.6, position = 'bottom-right', textColor = '#fff') {
   const base = await loadBaseIcon();
 
   function render(size) {
@@ -45,10 +45,28 @@ async function drawBadgeIcon(count, color, shape) {
 
     if (count > 0) {
       const margin = size * 0.02;
-      const w = size * 0.6;
+      const w = size * scale;
       const h = w;
-      const x = size - w - margin;
-      const y = size - h - margin;
+      let x;
+      let y;
+      switch (position) {
+        case 'top-left':
+          x = margin;
+          y = margin;
+          break;
+        case 'top-right':
+          x = size - w - margin;
+          y = margin;
+          break;
+        case 'bottom-left':
+          x = margin;
+          y = size - h - margin;
+          break;
+        default:
+          x = size - w - margin;
+          y = size - h - margin;
+          break;
+      }
       ctx.fillStyle = color;
       if (shape === 'round') {
         ctx.beginPath();
@@ -71,8 +89,8 @@ async function drawBadgeIcon(count, color, shape) {
         ctx.fill();
       }
 
-      ctx.fillStyle = '#fff';
-      ctx.font = `bold ${Math.round(size * 0.55)}px sans-serif`;
+      ctx.fillStyle = textColor;
+      ctx.font = `bold ${Math.round(w * 0.55)}px sans-serif`;
       ctx.textAlign = 'center';
       ctx.textBaseline = 'middle';
       ctx.fillText(String(count), x + w / 2, y + h / 2);
@@ -193,6 +211,9 @@ async function updateAllCounts() {
     }
     const {
       badgeColor,
+      textColor,
+      badgeScale,
+      badgePosition,
       dynamicColors,
       badgeShape,
       sound,
@@ -201,6 +222,9 @@ async function updateAllCounts() {
       dndEnd,
     } = await chrome.storage.sync.get({
       badgeColor: DEFAULT_BADGE_COLOR,
+      textColor: '#ffffff',
+      badgeScale: 0.6,
+      badgePosition: 'bottom-right',
       dynamicColors: false,
       badgeShape: 'round',
       sound: 'none',
@@ -211,7 +235,7 @@ async function updateAllCounts() {
 
     const color = dynamicColors ? getDynamicColor(total, badgeColor) : badgeColor;
     await chrome.action.setBadgeText({ text: '' });
-    await drawBadgeIcon(total, color, badgeShape);
+    await drawBadgeIcon(total, color, badgeShape, badgeScale, badgePosition, textColor);
 
     const lastTotal = Object.values(lastCounts).reduce((a, b) => a + b, 0);
 

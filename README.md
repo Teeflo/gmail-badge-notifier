@@ -33,3 +33,4 @@ Open the extension options to customize the badge appearance and notification so
 You can change the badge and text colors, size, position and shape, as well as choose an animation.
 One of the bundled sounds can be selected or you can upload your own custom file.
 Your preferences are stored using `chrome.storage.sync` so they will be restored the next time you open Chrome.
+Whenever you change an option the extension refreshes the unread count immediately so you can see the effect right away.

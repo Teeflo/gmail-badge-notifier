@@ -293,3 +293,12 @@ chrome.action.onClicked.addListener(async () => {
     await chrome.tabs.create({ url: 'https://mail.google.com/' });
   }
 });
+
+// Refresh counts and reschedule alarms when options page saves changes
+chrome.runtime.onMessage.addListener((msg) => {
+  if (msg && msg.action === 'optionsChanged') {
+    detectAccounts().then((urls) => { accountUrls = urls; });
+    scheduleAlarm();
+    updateAllCounts();
+  }
+});

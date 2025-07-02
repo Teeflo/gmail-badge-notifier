@@ -18,6 +18,7 @@ async function saveOptions() {
       reader.onload = async () => {
         await chrome.storage.sync.set({ badgeColor: color, sound: reader.result });
         showStatus();
+        chrome.runtime.sendMessage({ action: 'optionsChanged' });
       };
       reader.readAsDataURL(file);
       return;
@@ -37,6 +38,7 @@ async function saveOptions() {
     sound,
   });
   showStatus();
+  chrome.runtime.sendMessage({ action: 'optionsChanged' });
 }
 
 async function restoreOptions() {

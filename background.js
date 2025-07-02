@@ -138,10 +138,17 @@ async function updateAllCounts() {
       dndStart: '',
       dndEnd: '',
     });
+    let finalSound = sound;
+    if (sound === 'custom') {
+      const { customSound } = await chrome.storage.local.get({ customSound: 'none' });
+      finalSound = customSound;
+    }
 
     const color = dynamicColors ? getDynamicColor(total, badgeColor) : badgeColor;
     await chrome.action.setBadgeBackgroundColor({ color });
-    await chrome.action.setBadgeTextColor({ color: textColor });
+    if (chrome.action.setBadgeTextColor) {
+      await chrome.action.setBadgeTextColor({ color: textColor });
+    }
     await chrome.action.setBadgeText({ text: total > 0 ? String(total) : '' });
 
     const lastTotal = Object.values(lastCounts).reduce((a, b) => a + b, 0);
@@ -153,8 +160,8 @@ async function updateAllCounts() {
         title: 'New Email',
         message: `You have ${total} unread emails.`,
       });
-      if (sound !== 'none') {
-        const src = sound.startsWith('data:') ? sound : chrome.runtime.getURL(sound);
+      if (finalSound !== 'none') {
+        const src = finalSound.startsWith('data:') ? finalSound : chrome.runtime.getURL(finalSound);
         playSound(src);
       }
       if (animation === 'pulse') animateBadge(color);

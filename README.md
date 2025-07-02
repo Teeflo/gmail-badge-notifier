@@ -34,5 +34,6 @@ This extension only accesses the unread count via the Atom feed. It does not rea
 Open the extension options to customize the badge appearance and notification sound.
 You can change the badge and text colors and enable dynamic colors. An optional pulse animation can highlight new messages.
 One of the bundled sounds can be selected or you can upload your own custom file.
-Your preferences are stored using `chrome.storage.sync` so they will be restored the next time you open Chrome.
+Bundled options are synced across devices. Custom sounds are stored only locally due to size limits and will need to be added on each browser.
+Your other preferences are stored using `chrome.storage.sync` so they will be restored the next time you open Chrome.
 Whenever you change an option the extension refreshes the unread count immediately so you can see the effect right away.

@@ -7,21 +7,8 @@ async function saveOptions() {
   const dndStart = document.getElementById('dndStart').value;
   const dndEnd = document.getElementById('dndEnd').value;
   const select = document.getElementById('soundSelect');
-  const sound = select.value;
-  if (sound === 'custom') {
-    const file = document.getElementById('customSound').files[0];
-    if (file && file.size <= 500 * 1024) {
-      const reader = new FileReader();
-      reader.onload = async () => {
-        await chrome.storage.sync.set({ badgeColor: color, sound: reader.result });
-        showStatus();
-        chrome.runtime.sendMessage({ action: 'optionsChanged' });
-      };
-      reader.readAsDataURL(file);
-      return;
-    }
-  }
-  await chrome.storage.sync.set({
+  let sound = select.value;
+  const syncData = {
     badgeColor: color,
     textColor,
     dynamicColors,
@@ -29,8 +16,32 @@ async function saveOptions() {
     interval,
     dndStart,
     dndEnd,
-    sound,
-  });
+  };
+  const localData = {};
+
+  if (sound === 'custom') {
+    const file = document.getElementById('customSound').files[0];
+    if (file && file.size <= 500 * 1024) {
+      const reader = new FileReader();
+      reader.onload = async () => {
+        syncData.sound = 'custom';
+        localData.customSound = reader.result;
+        await chrome.storage.sync.set(syncData);
+        await chrome.storage.local.set(localData);
+        showStatus();
+        chrome.runtime.sendMessage({ action: 'optionsChanged' });
+      };
+      reader.readAsDataURL(file);
+      return;
+    }
+    // If no file selected, keep previously stored custom sound
+    sound = 'custom';
+  }
+  syncData.sound = sound;
+  await chrome.storage.sync.set(syncData);
+  if (Object.keys(localData).length) {
+    await chrome.storage.local.set(localData);
+  }
   showStatus();
   chrome.runtime.sendMessage({ action: 'optionsChanged' });
 }
@@ -55,6 +66,7 @@ async function restoreOptions() {
     dndEnd: '',
     sound: 'none',
   });
+  const { customSound } = await chrome.storage.local.get({ customSound: '' });
   document.getElementById('badgeColor').value = badgeColor;
   document.getElementById('textColor').value = textColor;
   document.getElementById('dynamicColors').checked = dynamicColors;
@@ -64,7 +76,7 @@ async function restoreOptions() {
   document.getElementById('dndStart').value = dndStart;
   document.getElementById('dndEnd').value = dndEnd;
   const select = document.getElementById('soundSelect');
-  if (sound.startsWith('data:')) {
+  if (sound === 'custom' && customSound) {
     select.value = 'custom';
   } else {
     select.value = sound;
@@ -84,9 +96,12 @@ document.addEventListener('DOMContentLoaded', restoreOptions);
 document.getElementById('badgeColor').addEventListener('change', saveOptions);
 document.getElementById('textColor').addEventListener('change', saveOptions);
 document.getElementById('soundSelect').addEventListener('change', () => {
+  const value = document.getElementById('soundSelect').value;
   const fileInput = document.getElementById('customSound');
-  fileInput.style.display = document.getElementById('soundSelect').value === 'custom' ? 'block' : 'none';
-  saveOptions();
+  fileInput.style.display = value === 'custom' ? 'block' : 'none';
+  if (value !== 'custom') {
+    saveOptions();
+  }
 });
 document.getElementById('customSound').addEventListener('change', saveOptions);
 document.getElementById('dynamicColors').addEventListener('change', saveOptions);

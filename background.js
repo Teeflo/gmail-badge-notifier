@@ -5,6 +5,7 @@
 const DEFAULT_BADGE_COLOR = '#D93025';
 let lastCounts = {};
 let accountUrls = [];
+let showPopup = false;
 
 /**
  * Structured logger helper.
@@ -60,6 +61,16 @@ function isDndActive(start, end) {
 chrome.storage.local.get({ lastCounts: {} }, (data) => {
   lastCounts = data.lastCounts || {};
 });
+
+/**
+ * Updates the extension popup according to user preference.
+ */
+async function updatePopupSetting() {
+  const { showPopup: pref } = await chrome.storage.sync.get({ showPopup: false });
+  showPopup = pref;
+  const popup = pref ? 'popup.html' : '';
+  await chrome.action.setPopup({ popup });
+}
 
 /**
  * Detects logged-in Gmail accounts by probing their Atom feeds.
@@ -235,6 +246,7 @@ async function updateAllCounts() {
 // Create the alarm when the extension is installed or started
 chrome.runtime.onInstalled.addListener(async () => {
   accountUrls = await detectAccounts();
+  await updatePopupSetting();
   await scheduleAlarm();
   updateAllCounts();
 });
@@ -242,6 +254,7 @@ chrome.runtime.onInstalled.addListener(async () => {
 // Update the badge and (re)schedule the alarm when the browser starts
 chrome.runtime.onStartup.addListener(async () => {
   accountUrls = await detectAccounts();
+  await updatePopupSetting();
   await scheduleAlarm();
   updateAllCounts();
 });
@@ -257,6 +270,7 @@ chrome.alarms.onAlarm.addListener(async (alarm) => {
 // Opens Gmail or activates the existing tab when the icon is clicked
 chrome.action.onClicked.addListener(async () => {
   updateAllCounts();
+  if (showPopup) return; // popup will open automatically
   const tabs = await chrome.tabs.query({ url: 'https://mail.google.com/*' });
   if (tabs.length > 0) {
     await chrome.tabs.update(tabs[0].id, { active: true });
@@ -270,6 +284,7 @@ chrome.action.onClicked.addListener(async () => {
 chrome.runtime.onMessage.addListener((msg) => {
   if (msg && msg.action === 'optionsChanged') {
     detectAccounts().then((urls) => { accountUrls = urls; });
+    updatePopupSetting();
     scheduleAlarm();
     updateAllCounts();
   }

@@ -1,0 +1,19 @@
+body {
+  min-width: 200px;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  padding: 10px;
+}
+#accounts {
+  margin-bottom: 10px;
+}
+.account {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 4px;
+}
+.actions {
+  text-align: center;
+}
+button {
+  padding: 4px 10px;
+}

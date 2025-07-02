@@ -3,7 +3,6 @@ async function saveOptions() {
   const dynamicColors = document.getElementById('dynamicColors').checked;
   const shape = document.getElementById('badgeShape').value;
   const animation = document.getElementById('animation').value;
-  const theme = document.getElementById('theme').value;
   const interval = parseFloat(document.getElementById('interval').value);
   const dndStart = document.getElementById('dndStart').value;
   const dndEnd = document.getElementById('dndEnd').value;
@@ -26,7 +25,6 @@ async function saveOptions() {
     dynamicColors,
     badgeShape: shape,
     animation,
-    theme,
     interval,
     dndStart,
     dndEnd,
@@ -41,7 +39,6 @@ async function restoreOptions() {
     dynamicColors,
     badgeShape,
     animation,
-    theme,
     interval,
     dndStart,
     dndEnd,
@@ -51,7 +48,6 @@ async function restoreOptions() {
     dynamicColors: false,
     badgeShape: 'round',
     animation: 'none',
-    theme: 'auto',
     interval: 1,
     dndStart: '',
     dndEnd: '',
@@ -61,7 +57,6 @@ async function restoreOptions() {
   document.getElementById('dynamicColors').checked = dynamicColors;
   document.getElementById('badgeShape').value = badgeShape;
   document.getElementById('animation').value = animation;
-  document.getElementById('theme').value = theme;
   document.getElementById('interval').value = interval;
   document.getElementById('intervalVal').textContent = interval;
   document.getElementById('dndStart').value = dndStart;
@@ -94,7 +89,6 @@ document.getElementById('customSound').addEventListener('change', saveOptions);
 document.getElementById('dynamicColors').addEventListener('change', saveOptions);
 document.getElementById('badgeShape').addEventListener('change', saveOptions);
 document.getElementById('animation').addEventListener('change', saveOptions);
-document.getElementById('theme').addEventListener('change', saveOptions);
 document.getElementById('interval').addEventListener('input', () => {
   document.getElementById('intervalVal').textContent = document.getElementById('interval').value;
   saveOptions();

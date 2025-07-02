@@ -5,6 +5,16 @@
 const DEFAULT_BADGE_COLOR = '#D93025';
 let lastCounts = {};
 let accountUrls = [];
+let baseIconBitmap;
+
+async function loadBaseIcon() {
+  if (!baseIconBitmap) {
+    const resp = await fetch(chrome.runtime.getURL('icons/icon128.png'));
+    const blob = await resp.blob();
+    baseIconBitmap = await createImageBitmap(blob);
+  }
+  return baseIconBitmap;
+}
 
 function getDynamicColor(count, base) {
   if (count >= 16) return '#D93025';
@@ -23,6 +33,51 @@ function isDndActive(start, end) {
   const e = eH * 60 + eM;
   if (s < e) return cur >= s && cur < e;
   return cur >= s || cur < e;
+}
+
+async function drawBadgeIcon(count, color, shape) {
+  const size = 128;
+  const canvas = new OffscreenCanvas(size, size);
+  const ctx = canvas.getContext('2d');
+  const base = await loadBaseIcon();
+  ctx.drawImage(base, 0, 0, size, size);
+
+  if (count > 0) {
+    const x = size - 40;
+    const y = 8;
+    const w = 32;
+    const h = 32;
+    ctx.fillStyle = color;
+    if (shape === 'round') {
+      ctx.beginPath();
+      ctx.arc(x + w / 2, y + h / 2, w / 2, 0, Math.PI * 2);
+      ctx.fill();
+    } else if (shape === 'square') {
+      ctx.fillRect(x, y, w, h);
+    } else if (shape === 'hex') {
+      const cx = x + w / 2;
+      const cy = y + h / 2;
+      const r = w / 2;
+      ctx.beginPath();
+      for (let i = 0; i < 6; i++) {
+        const angle = Math.PI / 3 * i + Math.PI / 6;
+        const px = cx + r * Math.cos(angle);
+        const py = cy + r * Math.sin(angle);
+        if (i === 0) ctx.moveTo(px, py); else ctx.lineTo(px, py);
+      }
+      ctx.closePath();
+      ctx.fill();
+    }
+
+    ctx.fillStyle = '#fff';
+    ctx.font = 'bold 64px sans-serif';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText(String(count), x + w / 2, y + h / 2);
+  }
+
+  const imageData = ctx.getImageData(0, 0, size, size);
+  await chrome.action.setIcon({ imageData: { 16: imageData, 32: imageData, 48: imageData, 128: imageData } });
 }
 
 chrome.storage.local.get({ lastCounts: {} }, (data) => {
@@ -113,16 +168,17 @@ async function updateAllCounts() {
       accountUrls = await detectAccounts();
     }
     const results = await Promise.all(accountUrls.map((u) => fetchUnread(u).catch(() => null)));
-    let total = 0;
     const counts = {};
+    let total = 0;
     for (const r of results) {
       if (!r) continue;
-      total += r.count;
+      if (!(r.email in counts)) total += r.count;
       counts[r.email] = r.count;
     }
     const {
       badgeColor,
       dynamicColors,
+      badgeShape,
       sound,
       animation,
       dndStart,
@@ -130,6 +186,7 @@ async function updateAllCounts() {
     } = await chrome.storage.sync.get({
       badgeColor: DEFAULT_BADGE_COLOR,
       dynamicColors: false,
+      badgeShape: 'round',
       sound: 'none',
       animation: 'none',
       dndStart: '',
@@ -137,12 +194,8 @@ async function updateAllCounts() {
     });
 
     const color = dynamicColors ? getDynamicColor(total, badgeColor) : badgeColor;
-    await chrome.action.setBadgeBackgroundColor({ color });
-    if (total === 0) {
-      await chrome.action.setBadgeText({ text: '' });
-    } else {
-      await chrome.action.setBadgeText({ text: total.toString() });
-    }
+    await chrome.action.setBadgeText({ text: '' });
+    await drawBadgeIcon(total, color, badgeShape);
 
     const lastTotal = Object.values(lastCounts).reduce((a, b) => a + b, 0);
 

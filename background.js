@@ -48,7 +48,7 @@ async function drawBadgeIcon(count, color, shape) {
       const w = size * 0.6;
       const h = w;
       const x = size - w - margin;
-      const y = margin;
+      const y = size - h - margin;
       ctx.fillStyle = color;
       if (shape === 'round') {
         ctx.beginPath();

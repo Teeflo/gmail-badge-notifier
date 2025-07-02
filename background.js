@@ -36,48 +36,64 @@ function isDndActive(start, end) {
 }
 
 async function drawBadgeIcon(count, color, shape) {
-  const size = 128;
-  const canvas = new OffscreenCanvas(size, size);
-  const ctx = canvas.getContext('2d');
   const base = await loadBaseIcon();
-  ctx.drawImage(base, 0, 0, size, size);
 
-  if (count > 0) {
-    const x = size - 40;
-    const y = 8;
-    const w = 32;
-    const h = 32;
-    ctx.fillStyle = color;
-    if (shape === 'round') {
-      ctx.beginPath();
-      ctx.arc(x + w / 2, y + h / 2, w / 2, 0, Math.PI * 2);
-      ctx.fill();
-    } else if (shape === 'square') {
-      ctx.fillRect(x, y, w, h);
-    } else if (shape === 'hex') {
-      const cx = x + w / 2;
-      const cy = y + h / 2;
-      const r = w / 2;
-      ctx.beginPath();
-      for (let i = 0; i < 6; i++) {
-        const angle = Math.PI / 3 * i + Math.PI / 6;
-        const px = cx + r * Math.cos(angle);
-        const py = cy + r * Math.sin(angle);
-        if (i === 0) ctx.moveTo(px, py); else ctx.lineTo(px, py);
+  function render(size) {
+    const canvas = new OffscreenCanvas(size, size);
+    const ctx = canvas.getContext('2d');
+    ctx.drawImage(base, 0, 0, size, size);
+
+    if (count > 0) {
+      const margin = size * 0.05;
+      const w = size * 0.35;
+      const h = w;
+      const x = size - w - margin;
+      const y = margin;
+      ctx.fillStyle = color;
+      if (shape === 'round') {
+        ctx.beginPath();
+        ctx.arc(x + w / 2, y + h / 2, w / 2, 0, Math.PI * 2);
+        ctx.fill();
+      } else if (shape === 'square') {
+        ctx.fillRect(x, y, w, h);
+      } else if (shape === 'hex') {
+        const cx = x + w / 2;
+        const cy = y + h / 2;
+        const r = w / 2;
+        ctx.beginPath();
+        for (let i = 0; i < 6; i++) {
+          const angle = Math.PI / 3 * i + Math.PI / 6;
+          const px = cx + r * Math.cos(angle);
+          const py = cy + r * Math.sin(angle);
+          if (i === 0) ctx.moveTo(px, py); else ctx.lineTo(px, py);
+        }
+        ctx.closePath();
+        ctx.fill();
       }
-      ctx.closePath();
-      ctx.fill();
+
+      ctx.fillStyle = '#fff';
+      ctx.font = `bold ${Math.round(size * 0.35)}px sans-serif`;
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText(String(count), x + w / 2, y + h / 2);
     }
 
-    ctx.fillStyle = '#fff';
-    ctx.font = 'bold 64px sans-serif';
-    ctx.textAlign = 'center';
-    ctx.textBaseline = 'middle';
-    ctx.fillText(String(count), x + w / 2, y + h / 2);
+    return ctx.getImageData(0, 0, size, size);
   }
 
-  const imageData = ctx.getImageData(0, 0, size, size);
-  await chrome.action.setIcon({ imageData: { 16: imageData, 32: imageData, 48: imageData, 128: imageData } });
+  const images = {
+    16: render(16),
+    32: render(32),
+    48: render(48),
+    128: render(128),
+  };
+
+  const resolved = {};
+  for (const [size, data] of Object.entries(images)) {
+    resolved[size] = await data;
+  }
+
+  await chrome.action.setIcon({ imageData: resolved });
 }
 
 chrome.storage.local.get({ lastCounts: {} }, (data) => {

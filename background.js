@@ -5,6 +5,7 @@
 const DEFAULT_BADGE_COLOR = '#D93025';
 let lastCounts = {};
 let accountUrls = [];
+let showPopup = false;
 
 /**
  * Structured logger helper.
@@ -21,6 +22,12 @@ function log(level, msg, data = {}) {
 const CACHE_TTL = 30000; // 30 seconds
 const FETCH_TIMEOUT = 10000;
 const cache = new Map();
+
+async function updatePopupSetting() {
+  const { showPopup: enabled } = await chrome.storage.sync.get({ showPopup: false });
+  showPopup = enabled;
+  await chrome.action.setPopup({ popup: enabled ? 'popup.html' : '' });
+}
 
 function delay(ms) {
   return new Promise((resolve) => setTimeout(resolve, ms));
@@ -58,6 +65,7 @@ function isDndActive(start, end) {
 
 chrome.storage.local.get({ lastCounts: {} }, (data) => {
   lastCounts = data.lastCounts || {};
+  updatePopupSetting();
 });
 
 /**
@@ -234,6 +242,7 @@ async function updateAllCounts() {
 // Create the alarm when the extension is installed or started
 chrome.runtime.onInstalled.addListener(async () => {
   accountUrls = await detectAccounts();
+  await updatePopupSetting();
   await scheduleAlarm();
   updateAllCounts();
 });
@@ -241,6 +250,7 @@ chrome.runtime.onInstalled.addListener(async () => {
 // Update the badge and (re)schedule the alarm when the browser starts
 chrome.runtime.onStartup.addListener(async () => {
   accountUrls = await detectAccounts();
+  await updatePopupSetting();
   await scheduleAlarm();
   updateAllCounts();
 });
@@ -269,6 +279,7 @@ chrome.action.onClicked.addListener(async () => {
 chrome.runtime.onMessage.addListener((msg) => {
   if (msg && msg.action === 'optionsChanged') {
     detectAccounts().then((urls) => { accountUrls = urls; });
+    updatePopupSetting();
     scheduleAlarm();
     updateAllCounts();
   }

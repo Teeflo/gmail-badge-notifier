@@ -1,29 +1,47 @@
 body {
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   padding: 24px;
-  background: #f5f5f5;
+  background: linear-gradient(135deg, #e3f2fd, #f5f5f5);
 }
 
 .container {
   max-width: 520px;
   margin: 0 auto;
   background: #fff;
-  padding: 24px;
-  border-radius: 10px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.08);
+  padding: 32px;
+  border-radius: 12px;
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
 }
 
 h1 {
   text-align: center;
-  margin-top: 0;
-  margin-bottom: 24px;
+  margin: 0;
   font-size: 22px;
 }
 
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin-bottom: 24px;
+}
+
+.header img {
+  width: 32px;
+  height: 32px;
+}
+
 section {
-  margin-bottom: 20px;
+  margin-bottom: 24px;
   display: flex;
   flex-direction: column;
+}
+
+section:not(:last-of-type) {
+  border-bottom: 1px solid #eee;
+  padding-bottom: 16px;
 }
 
 label {
@@ -39,6 +57,13 @@ input[type="range"] {
   border: 1px solid #ccc;
   border-radius: 4px;
   font-size: 14px;
+  width: 100%;
+}
+
+input[type="color"] {
+  padding: 0;
+  width: 40px;
+  height: 32px;
 }
 
 .dnd {
@@ -52,6 +77,8 @@ input[type="range"] {
   transition: opacity 0.3s ease;
   color: #4caf50;
   text-align: center;
+  font-weight: 500;
+  margin-top: 8px;
 }
 
 @media (prefers-color-scheme: dark) {

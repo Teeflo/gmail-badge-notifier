@@ -8,7 +8,6 @@ async function saveOptions() {
   const dndEnd = document.getElementById('dndEnd').value;
   const nightStart = document.getElementById('nightStart').value;
   const nightEnd = document.getElementById('nightEnd').value;
-  const showPopup = document.getElementById('showPopup').checked;
   const select = document.getElementById('soundSelect');
   const sound = select.value;
   if (sound === 'custom') {
@@ -34,7 +33,6 @@ async function saveOptions() {
     dndEnd,
     nightStart,
     nightEnd,
-    showPopup,
     sound,
   });
   showStatus();
@@ -52,7 +50,6 @@ async function restoreOptions() {
     dndEnd,
     nightStart,
     nightEnd,
-    showPopup,
     sound,
   } = await chrome.storage.sync.get({
     badgeColor: '#D93025',
@@ -64,7 +61,6 @@ async function restoreOptions() {
     dndEnd: '',
     nightStart: '22:00',
     nightEnd: '07:00',
-    showPopup: false,
     sound: 'none',
   });
   document.getElementById('badgeColor').value = badgeColor;
@@ -77,7 +73,6 @@ async function restoreOptions() {
   document.getElementById('dndEnd').value = dndEnd;
   document.getElementById('nightStart').value = nightStart;
   document.getElementById('nightEnd').value = nightEnd;
-  document.getElementById('showPopup').checked = showPopup;
   const select = document.getElementById('soundSelect');
   if (sound.startsWith('data:')) {
     select.value = 'custom';
@@ -114,4 +109,3 @@ document.getElementById('dndStart').addEventListener('change', saveOptions);
 document.getElementById('dndEnd').addEventListener('change', saveOptions);
 document.getElementById('nightStart').addEventListener('change', saveOptions);
 document.getElementById('nightEnd').addEventListener('change', saveOptions);
-document.getElementById('showPopup').addEventListener('change', saveOptions);

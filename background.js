@@ -44,8 +44,8 @@ async function drawBadgeIcon(count, color, shape) {
     ctx.drawImage(base, 0, 0, size, size);
 
     if (count > 0) {
-      const margin = size * 0.03;
-      const w = size * 0.45;
+      const margin = size * 0.02;
+      const w = size * 0.6;
       const h = w;
       const x = size - w - margin;
       const y = margin;
@@ -72,7 +72,7 @@ async function drawBadgeIcon(count, color, shape) {
       }
 
       ctx.fillStyle = '#fff';
-      ctx.font = `bold ${Math.round(size * 0.45)}px sans-serif`;
+      ctx.font = `bold ${Math.round(size * 0.55)}px sans-serif`;
       ctx.textAlign = 'center';
       ctx.textBaseline = 'middle';
       ctx.fillText(String(count), x + w / 2, y + h / 2);

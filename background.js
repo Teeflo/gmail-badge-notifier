@@ -5,16 +5,6 @@
 const DEFAULT_BADGE_COLOR = '#D93025';
 let lastCounts = {};
 let accountUrls = [];
-let baseIconBitmap;
-
-async function loadBaseIcon() {
-  if (!baseIconBitmap) {
-    const resp = await fetch(chrome.runtime.getURL('icons/icon128.png'));
-    const blob = await resp.blob();
-    baseIconBitmap = await createImageBitmap(blob);
-  }
-  return baseIconBitmap;
-}
 
 function getDynamicColor(count, base) {
   if (count >= 16) return '#D93025';
@@ -35,84 +25,6 @@ function isDndActive(start, end) {
   return cur >= s || cur < e;
 }
 
-async function drawBadgeIcon(count, color, shape, scale = 0.6, position = 'bottom-right', textColor = '#fff') {
-  const base = await loadBaseIcon();
-
-  function render(size) {
-    const canvas = new OffscreenCanvas(size, size);
-    const ctx = canvas.getContext('2d');
-    ctx.drawImage(base, 0, 0, size, size);
-
-    if (count > 0) {
-      const margin = size * 0.02;
-      const w = size * scale;
-      const h = w;
-      let x;
-      let y;
-      switch (position) {
-        case 'top-left':
-          x = margin;
-          y = margin;
-          break;
-        case 'top-right':
-          x = size - w - margin;
-          y = margin;
-          break;
-        case 'bottom-left':
-          x = margin;
-          y = size - h - margin;
-          break;
-        default:
-          x = size - w - margin;
-          y = size - h - margin;
-          break;
-      }
-      ctx.fillStyle = color;
-      if (shape === 'round') {
-        ctx.beginPath();
-        ctx.arc(x + w / 2, y + h / 2, w / 2, 0, Math.PI * 2);
-        ctx.fill();
-      } else if (shape === 'square') {
-        ctx.fillRect(x, y, w, h);
-      } else if (shape === 'hex') {
-        const cx = x + w / 2;
-        const cy = y + h / 2;
-        const r = w / 2;
-        ctx.beginPath();
-        for (let i = 0; i < 6; i++) {
-          const angle = Math.PI / 3 * i + Math.PI / 6;
-          const px = cx + r * Math.cos(angle);
-          const py = cy + r * Math.sin(angle);
-          if (i === 0) ctx.moveTo(px, py); else ctx.lineTo(px, py);
-        }
-        ctx.closePath();
-        ctx.fill();
-      }
-
-      ctx.fillStyle = textColor;
-      ctx.font = `bold ${Math.round(w * 0.55)}px sans-serif`;
-      ctx.textAlign = 'center';
-      ctx.textBaseline = 'middle';
-      ctx.fillText(String(count), x + w / 2, y + h / 2);
-    }
-
-    return ctx.getImageData(0, 0, size, size);
-  }
-
-  const images = {
-    16: render(16),
-    32: render(32),
-    48: render(48),
-    128: render(128),
-  };
-
-  const resolved = {};
-  for (const [size, data] of Object.entries(images)) {
-    resolved[size] = await data;
-  }
-
-  await chrome.action.setIcon({ imageData: resolved });
-}
 
 chrome.storage.local.get({ lastCounts: {} }, (data) => {
   lastCounts = data.lastCounts || {};
@@ -212,10 +124,7 @@ async function updateAllCounts() {
     const {
       badgeColor,
       textColor,
-      badgeScale,
-      badgePosition,
       dynamicColors,
-      badgeShape,
       sound,
       animation,
       dndStart,
@@ -223,10 +132,7 @@ async function updateAllCounts() {
     } = await chrome.storage.sync.get({
       badgeColor: DEFAULT_BADGE_COLOR,
       textColor: '#ffffff',
-      badgeScale: 0.6,
-      badgePosition: 'bottom-right',
       dynamicColors: false,
-      badgeShape: 'round',
       sound: 'none',
       animation: 'none',
       dndStart: '',
@@ -235,8 +141,8 @@ async function updateAllCounts() {
 
     const color = dynamicColors ? getDynamicColor(total, badgeColor) : badgeColor;
     await chrome.action.setBadgeBackgroundColor({ color });
+    await chrome.action.setBadgeTextColor({ color: textColor });
     await chrome.action.setBadgeText({ text: total > 0 ? String(total) : '' });
-    await drawBadgeIcon(total, color, badgeShape, badgeScale, badgePosition, textColor);
 
     const lastTotal = Object.values(lastCounts).reduce((a, b) => a + b, 0);
 

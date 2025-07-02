@@ -2,9 +2,6 @@ async function saveOptions() {
   const color = document.getElementById('badgeColor').value;
   const dynamicColors = document.getElementById('dynamicColors').checked;
   const textColor = document.getElementById('textColor').value;
-  const scale = parseInt(document.getElementById('badgeScale').value, 10) / 100;
-  const position = document.getElementById('badgePosition').value;
-  const shape = document.getElementById('badgeShape').value;
   const animation = document.getElementById('animation').value;
   const interval = parseFloat(document.getElementById('interval').value);
   const dndStart = document.getElementById('dndStart').value;
@@ -27,10 +24,7 @@ async function saveOptions() {
   await chrome.storage.sync.set({
     badgeColor: color,
     textColor,
-    badgeScale: scale,
-    badgePosition: position,
     dynamicColors,
-    badgeShape: shape,
     animation,
     interval,
     dndStart,
@@ -45,10 +39,7 @@ async function restoreOptions() {
   const {
     badgeColor,
     textColor,
-    badgeScale,
-    badgePosition,
     dynamicColors,
-    badgeShape,
     animation,
     interval,
     dndStart,
@@ -57,10 +48,7 @@ async function restoreOptions() {
   } = await chrome.storage.sync.get({
     badgeColor: '#D93025',
     textColor: '#ffffff',
-    badgeScale: 0.6,
-    badgePosition: 'bottom-right',
     dynamicColors: false,
-    badgeShape: 'round',
     animation: 'none',
     interval: 1,
     dndStart: '',
@@ -69,11 +57,7 @@ async function restoreOptions() {
   });
   document.getElementById('badgeColor').value = badgeColor;
   document.getElementById('textColor').value = textColor;
-  document.getElementById('badgeScale').value = Math.round(badgeScale * 100);
-  document.getElementById('badgeScaleVal').textContent = Math.round(badgeScale * 100);
-  document.getElementById('badgePosition').value = badgePosition;
   document.getElementById('dynamicColors').checked = dynamicColors;
-  document.getElementById('badgeShape').value = badgeShape;
   document.getElementById('animation').value = animation;
   document.getElementById('interval').value = interval;
   document.getElementById('intervalVal').textContent = interval;
@@ -106,13 +90,7 @@ document.getElementById('soundSelect').addEventListener('change', () => {
 });
 document.getElementById('customSound').addEventListener('change', saveOptions);
 document.getElementById('dynamicColors').addEventListener('change', saveOptions);
-document.getElementById('badgeShape').addEventListener('change', saveOptions);
 document.getElementById('animation').addEventListener('change', saveOptions);
-document.getElementById('badgeScale').addEventListener('input', () => {
-  document.getElementById('badgeScaleVal').textContent = document.getElementById('badgeScale').value;
-  saveOptions();
-});
-document.getElementById('badgePosition').addEventListener('change', saveOptions);
 document.getElementById('interval').addEventListener('input', () => {
   document.getElementById('intervalVal').textContent = document.getElementById('interval').value;
   saveOptions();

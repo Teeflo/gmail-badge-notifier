@@ -6,55 +6,71 @@
   <link rel="stylesheet" href="options.css">
 </head>
 <body>
+
   <div class="container">
     <div class="header">
       <img src="icons/icon32.png" alt="Extension icon">
-      <h1>Extension Options</h1>
+      <h1>Options Gmail Badge Notifier</h1>
     </div>
-    <section>
-      <label for="badgeColor">Badge color:</label>
-      <input type="color" id="badgeColor">
-    </section>
-      <section>
-        <label for="dynamicColors">
+    <form id="optionsForm">
+      <div class="section">
+        <h2>Apparence</h2>
+        <div class="row">
+          <label for="badgeColor">Couleur du badge</label>
+          <input type="color" id="badgeColor">
+        </div>
+        <div class="row">
+          <label for="textColor">Couleur du texte</label>
+          <input type="color" id="textColor">
+        </div>
+        <div class="row checkbox-row">
           <input type="checkbox" id="dynamicColors">
-          Use dynamic badge colors
-        </label>
-      </section>
-      <section>
-        <label for="textColor">Badge text color:</label>
-        <input type="color" id="textColor">
-      </section>
-    <section>
-      <label for="animation">Badge animation:</label>
-      <select id="animation">
-        <option value="none">None</option>
-        <option value="pulse">Pulse</option>
-      </select>
-    </section>
-    <section>
-      <label for="interval">Check interval (minutes): <span id="intervalVal"></span></label>
-      <input type="range" id="interval" min="0.5" max="30" step="0.5">
-    </section>
-    <section>
-      <label>Do Not Disturb:</label>
-      <div class="dnd">
-        <input type="time" id="dndStart"> -
-        <input type="time" id="dndEnd">
+          <label for="dynamicColors">Couleurs dynamiques</label>
+        </div>
+        <div class="row">
+          <label for="animation">Animation du badge</label>
+          <select id="animation">
+            <option value="none">Aucune</option>
+            <option value="pulse">Pulse</option>
+          </select>
+        </div>
       </div>
-    </section>
-    <section>
-      <label for="soundSelect">Notification sound:</label>
-      <select id="soundSelect">
-        <option value="none">None</option>
-        <option value="sounds/ding.mp3">Ding</option>
-        <option value="sounds/chime.mp3">Chime</option>
-        <option value="sounds/notify.mp3">Notify</option>
-        <option value="custom">Custom...</option>
-      </select>
-      <input type="file" id="customSound" accept="audio/*" style="display:none">
-    </section>
-    <div id="status" class="status"></div>
+      <div class="section">
+  <h2><span class="notif-section-title-icon">🔔</span> Notifications</h2>
+  <div class="row notif-row">
+          <label for="soundSelect">Son de notification</label>
+          <select id="soundSelect">
+            <option value="none">Aucun</option>
+            <option value="sounds/ding.mp3">Ding</option>
+            <option value="sounds/chime.mp3">Chime</option>
+            <option value="sounds/notify.mp3">Notify</option>
+            <option value="custom">Personnalisé...</option>
+          </select>
+          <div id="customSoundRow">
+            <input type="file" id="customSound" accept="audio/*" title="Sélectionner un son personnalisé">
+          </div>
+          <div class="notif-desc">
+            Choisissez un son pour les notifications de nouveaux mails Gmail.
+          </div>
+        </div>
+      </div>
+      <div class="section">
+        <h2>Comportement</h2>
+        <div class="row">
+          <label for="interval">Intervalle de vérification (minutes) : <span id="intervalVal"></span></label>
+          <input type="range" id="interval" min="0.5" max="30" step="0.5">
+        </div>
+        <div class="row">
+          <label>Ne pas déranger</label>
+          <div class="dnd">
+            <input type="time" id="dndStart" title="Début du mode Ne pas déranger" placeholder="Début"> -
+            <input type="time" id="dndEnd" title="Fin du mode Ne pas déranger" placeholder="Fin">
+          </div>
+        </div>
+      </div>
+      <button type="submit" class="save-btn">Enregistrer</button>
+      <div id="status" class="status"></div>
+    </form>
   </div>
   <script src="options.js"></script>
 </body>

@@ -89,20 +89,28 @@ function showStatus() {
   }, 1000);
 }
 
-document.addEventListener('DOMContentLoaded', restoreOptions);
-document.getElementById('badgeColor').addEventListener('change', saveOptions);
-document.getElementById('textColor').addEventListener('change', saveOptions);
-document.getElementById('soundSelect').addEventListener('change', () => {
-  const fileInput = document.getElementById('customSound');
-  fileInput.style.display = document.getElementById('soundSelect').value === 'custom' ? 'block' : 'none';
-  saveOptions();
+
+document.addEventListener('DOMContentLoaded', () => {
+  restoreOptions();
+  document.getElementById('interval').addEventListener('input', () => {
+    document.getElementById('intervalVal').textContent = document.getElementById('interval').value;
+  });
+  document.getElementById('soundSelect').addEventListener('change', () => {
+    const customRow = document.getElementById('customSoundRow');
+    if (document.getElementById('soundSelect').value === 'custom') {
+      customRow.style.display = 'block';
+    } else {
+      customRow.style.display = 'none';
+    }
+  });
+  // Affiche le champ customSound si custom est déjà sélectionné
+  if (document.getElementById('soundSelect').value === 'custom') {
+    document.getElementById('customSoundRow').style.display = 'block';
+  } else {
+    document.getElementById('customSoundRow').style.display = 'none';
+  }
+  document.getElementById('optionsForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    saveOptions();
+  });
 });
-document.getElementById('customSound').addEventListener('change', saveOptions);
-document.getElementById('dynamicColors').addEventListener('change', saveOptions);
-document.getElementById('animation').addEventListener('change', saveOptions);
-document.getElementById('interval').addEventListener('input', () => {
-  document.getElementById('intervalVal').textContent = document.getElementById('interval').value;
-  saveOptions();
-});
-document.getElementById('dndStart').addEventListener('change', saveOptions);
-document.getElementById('dndEnd').addEventListener('change', saveOptions);
